@@ -1,5 +1,7 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
+const Phonebook = require('./models/phonebook')
 const cors = require('cors')
 const morgan = require('morgan')
 
@@ -41,7 +43,7 @@ let persons = [
 ]
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Phonebook.find({}).then(persons => response.json(persons))
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -77,23 +79,21 @@ app.post('/api/persons', (request, response) => {
             error: 'name or number missing'
         })
     }
-
+    /*
     if(persons.some(person => person.name === body.name)){
         return response.status(400).json({
             error: 'name must be unique'
         })
     }
-
-    const person = {
+    */
+    const person = new Phonebook({
         id: Math.floor(Math.random()*100+10),
         name: body.name,
         number: body.number
 
-    }
+    })
 
-    persons = persons.concat(person)
-
-    response.json(person)
+    person.save().then(savedPerson => response.json(savedPerson))
 
 })
 
